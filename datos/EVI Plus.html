@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>EVI Plus — MTY Valle</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F7F7F5;--surface:#FFFFFF;--surface2:#F0F0EC;--border:#E4E4DF;
+  --text:#1A1A18;--text2:#6B6B66;--text3:#A0A09A;
+  --accent:#8B1A1A;--accent-soft:#F9F0F0;
+  --green:#15803D;--green-soft:#DCFCE7;
+  --amber:#B45309;--amber-soft:#FEF3C7;
+  --red:#DC2626;--red-soft:#FEE2E2;
+  --navy:#2C2C2C;--navy-soft:#F0EDED;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+button{cursor:pointer;font-family:'Inter',sans-serif}
+
+/* TOP BAR */
+.topbar{background:var(--navy);color:#fff;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.tb-brand{display:flex;align-items:center;gap:10px}
+.tb-logo{width:30px;height:30px;background:linear-gradient(135deg,#B22222,#7B0000);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;letter-spacing:-.5px}
+.tb-name{font-weight:700;font-size:15px;letter-spacing:-.3px}
+.tb-tag{font-size:10px;background:rgba(255,255,255,.1);padding:2px 8px;border-radius:20px;color:rgba(255,255,255,.65);margin-left:4px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-date{font-size:11px;color:rgba(255,255,255,.45);font-family:'DM Mono',monospace}
+.tb-sync{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.55)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#555;flex-shrink:0}
+.sync-dot.ok{background:#4CAF50}
+.sync-dot.loading{background:var(--amber);animation:blink 1s infinite}
+.sync-dot.err{background:#EF5350}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.btn-logout{padding:5px 12px;border:1px solid rgba(255,255,255,.15);border-radius:var(--radius-sm);background:none;color:rgba(255,255,255,.65);font-size:11px;font-family:'Inter',sans-serif}
+.btn-logout:hover{background:rgba(255,255,255,.08)}
+
+/* LOADER */
+.loader-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;gap:14px}
+.loader-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-msg{font-size:13px;color:var(--text2)}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 52px);padding:20px}
+.screen.active{display:block}
+
+/* LOGIN */
+.login-wrap{max-width:360px;margin:50px auto 0}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-md)}
+.login-hdr{text-align:center;margin-bottom:26px}
+.login-icon{width:50px;height:50px;background:linear-gradient(135deg,#B22222,#7B0000);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-size:22px}
+.login-title{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:3px}
+.login-sub{font-size:12px;color:var(--text2)}
+.role-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:18px}
+.role-tab{padding:10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;text-align:center}
+.role-tab.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase}
+.fg select,.fg input{width:100%;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);outline:none;transition:border-color .15s}
+.fg select:focus,.fg input:focus{border-color:var(--accent)}
+.btn-enter{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;margin-top:4px;transition:background .15s}
+.btn-enter:hover{background:#1a1a1a}
+.login-note{text-align:center;font-size:11px;color:var(--text3);margin-top:14px}
+
+/* TABS */
+.nav-tabs{display:flex;border-bottom:1px solid var(--border);margin:-20px -20px 20px;padding:0 20px;background:var(--surface);overflow-x:auto}
+.nav-tab{padding:14px 16px;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.sc-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:4px}
+.sc-val{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.sc-sub{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* EVI HERO */
+.evi-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow)}
+.evi-info{flex:1}
+.evi-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:2px}
+.evi-num{font-size:34px;font-weight:700;letter-spacing:-1px;line-height:1}
+.evi-sub{font-size:12px;color:var(--text2);margin-top:3px}
+.evi-bars{display:flex;gap:4px;margin-top:10px}
+.ebi{flex:1;text-align:center}
+.ebi-lbl{font-size:9px;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.3px}
+.ebi-val{font-size:13px;font-weight:600;font-family:'DM Mono',monospace}
+
+/* PERIODO TOGGLE */
+.periodo-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px;width:fit-content}
+.pt-btn{padding:6px 14px;border-radius:5px;border:none;background:none;font-size:12px;font-weight:500;color:var(--text2);transition:all .15s}
+.pt-btn.active{background:var(--navy);color:#fff;box-shadow:var(--shadow)}
+
+/* VIEW HEADER */
+.view-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.view-hdr-title{font-size:15px;font-weight:700;letter-spacing:-.3px}
+
+/* FAM CARDS */
+.fam-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.fam-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.fam-hdr{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.fam-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px}
+.fam-right{display:flex;align-items:center;gap:8px}
+.fam-pond{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.fam-chev{color:var(--text3);font-size:10px;transition:transform .2s}
+.fam-card.open .fam-chev{transform:rotate(180deg)}
+.fam-prog{height:3px;background:var(--border)}
+.fam-prog-fill{height:100%;border-radius:2px;transition:width .5s}
+.fam-body{display:none;padding:12px 14px;border-top:1px solid var(--border);background:var(--bg)}
+.fam-card.open .fam-body{display:block}
+.fam-dg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.fdi-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px}
+.fdi-val{font-size:13px;font-weight:600;font-family:'DM Mono',monospace}
+
+/* CAPTURA INPUTS */
+.cap-box{border-radius:var(--radius-sm);padding:12px;margin-top:6px}
+.cap-box.rojo{background:#FDF5F5;border:1px solid #F0CECE}
+.cap-box.gris{background:var(--accent-soft);border:1px solid #E8D4D4}
+.cap-box-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;color:var(--accent)}
+.cap-inp{border:1.5px solid #D4A0A0;border-radius:var(--radius-sm);padding:9px 11px;font-size:14px;font-family:'DM Mono',monospace;background:#fff;color:var(--text);outline:none;width:100%;transition:border-color .15s}
+.cap-inp:focus{border-color:var(--accent)}
+.cap-result{background:#fff;border:1px solid #E8D0D0;border-radius:var(--radius-sm);padding:10px 12px;margin-top:8px}
+.cap-result-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text2);padding:2px 0}
+.cap-result-row.total{font-weight:600;color:var(--text);font-size:13px;border-top:1px solid var(--border);margin-top:4px;padding-top:6px}
+.cap-proy-note{font-size:11px;color:var(--text3);margin-top:6px;font-style:italic}
+
+/* TABLA */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--navy);color:rgba(255,255,255,.8);font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:9px 10px;text-align:left;white-space:nowrap}
+thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--bg)}
+tbody tr.hl{background:#FFFBF0}
+tbody td{padding:8px 10px;vertical-align:middle}
+tbody td.r{text-align:right;font-family:'DM Mono',monospace}
+tfoot td{background:var(--surface2);border-top:2px solid var(--border);font-weight:600;padding:8px 10px;font-size:12px}
+tfoot td.r{text-align:right;font-family:'DM Mono',monospace}
+
+/* CHIPS */
+.chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;white-space:nowrap}
+.cg{background:var(--green-soft);color:var(--green)}
+.ca{background:var(--amber-soft);color:var(--amber)}
+.cr{background:var(--red-soft);color:var(--red)}
+.cgr{background:var(--surface2);color:var(--text2)}
+
+/* RANKING */
+.rank-list{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.rank-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.rank-n{width:22px;height:22px;border-radius:50%;background:var(--surface2);font-size:11px;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-n.g1{background:#C9973A;color:#fff}
+.rank-n.g2{background:#888;color:#fff}
+.rank-n.g3{background:#A0522D;color:#fff}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-cr{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.rank-bw{height:3px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden}
+.rank-bf{height:100%;border-radius:2px;transition:width .5s}
+.rank-evi{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;white-space:nowrap}
+
+/* SECTION TITLE */
+.sec-title{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sec-title span{font-weight:400;text-transform:none;letter-spacing:0}
+
+/* BOTTOM NAV */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.bnav-items{display:flex;justify-content:space-around}
+.bni{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 16px;border:none;background:none;color:var(--text2);font-size:10px;font-weight:500;transition:color .15s}
+.bni.active{color:var(--accent)}
+.bni-icon{font-size:20px;line-height:1}
+
+/* SAVE BAR */
+.save-bar{position:fixed;bottom:0;left:0;right:0;background:var(--accent);color:#fff;padding:12px 20px;display:none;align-items:center;justify-content:space-between;z-index:60;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
+.save-bar.on{display:flex}
+.save-bar-msg{font-size:13px;font-weight:500}
+.save-bar-actions{display:flex;gap:8px}
+.btn-save{background:#fff;color:var(--accent);border:none;border-radius:var(--radius-sm);padding:8px 16px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif}
+.btn-cancel-save{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:'Inter',sans-serif}
+
+/* DOWNLOAD BTN */
+.btn-dl{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;transition:background .15s}
+.btn-dl:hover{background:#1a1a1a}
+.btn-dl-sec{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-dl-sec:hover{background:var(--surface2)}
+
+/* TOAST */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--navy);color:#fff;padding:10px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;box-shadow:var(--shadow-md);z-index:300;transition:transform .25s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* SUBTABS hidden */
+.subtab{display:none}
+.subtab.active{display:block}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+
+/* REG TAG */
+.reg-mty{background:#FEF3C7;color:#92400E;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;margin-right:4px}
+
+@media(max-width:600px){
+  .screen{padding:14px 14px 80px}
+  .bnav{display:block}
+  .nav-tabs{display:none}
+  .evi-num{font-size:28px}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader-screen" id="loader">
+  <div class="loader-spinner"></div>
+  <div class="loader-msg" id="loader-msg">Cargando datos del día...</div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-brand">
+    <div class="tb-logo">E+</div>
+    <div class="tb-name">EVI Plus <span class="tb-tag">MTY Valle</span></div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-sync"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt" style="display:none"></span></div>
+    <div class="tb-date" id="tb-date"></div>
+    <button class="btn-logout" id="btn-logout" style="display:none" onclick="logout()">Salir</button>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-hdr">
+        <div class="login-icon">📊</div>
+        <div class="login-title">EVI Plus</div>
+        <div class="login-sub">Seguimiento diario · MTY Valle 2025</div>
+      </div>
+      <div class="role-tabs">
+        <button class="role-tab active" id="rtab-suc" onclick="setRole('suc')">Sucursal</button>
+        <button class="role-tab" id="rtab-dir" onclick="setRole('dir')">Director</button>
+      </div>
+      <div id="form-suc">
+        <div class="fg"><label>Sucursal</label>
+          <select id="sel-cr"><option value="">— Selecciona tu CR —</option></select>
+        </div>
+      </div>
+      <div id="form-dir" style="display:none">
+        <div class="fg"><label>Clave de acceso</label>
+          <input type="password" id="inp-pass" placeholder="••••••" autocomplete="off">
+        </div>
+      </div>
+      <button class="btn-enter" onclick="doLogin()">Entrar al sistema</button>
+      <div class="login-note">Plataforma interna · Regional Norte 2025</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUCURSAL ══ -->
+<div class="screen" id="screen-suc">
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSucTab('st-resumen',this)">Resumen</button>
+    <button class="nav-tab" onclick="showSucTab('st-familias',this)">Familias</button>
+    <button class="nav-tab" onclick="showSucTab('st-captura',this)">Captura del día</button>
+  </div>
+
+  <div class="subtab active" id="st-resumen">
+    <div class="view-hdr">
+      <div class="view-hdr-title" id="suc-title">—</div>
+      <div class="periodo-toggle">
+        <button class="pt-btn active" onclick="setPeriodo('mensual',this)">Mensual</button>
+        <button class="pt-btn" onclick="setPeriodo('anual',this)">Anual</button>
+      </div>
+    </div>
+    <div class="evi-hero">
+      <div>
+        <svg width="68" height="68" viewBox="0 0 68 68">
+          <circle cx="34" cy="34" r="28" fill="none" stroke="#E4E4DF" stroke-width="7"/>
+          <circle id="evi-arc" cx="34" cy="34" r="28" fill="none" stroke="#2C2C2C" stroke-width="7"
+            stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9"
+            transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .7s,stroke .4s"/>
+        </svg>
+      </div>
+      <div class="evi-info">
+        <div class="evi-lbl">EVI Total</div>
+        <div class="evi-num" id="evi-num">—%</div>
+        <div class="evi-sub" id="evi-sub">—</div>
+        <div class="evi-bars">
+          <div class="ebi"><div class="ebi-lbl">Rango</div><div class="ebi-val" id="evi-rango">—</div></div>
+          <div class="ebi"><div class="ebi-lbl">Pond.</div><div class="ebi-val" id="evi-pond">—</div></div>
+          <div class="ebi"><div class="ebi-lbl">Logro</div><div class="ebi-val" id="evi-logro">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="stats-row" id="suc-stats"></div>
+  </div>
+
+  <div class="subtab" id="st-familias">
+    <div class="view-hdr">
+      <div class="sec-title" style="border:none;padding:0;margin:0">Detalle por familia</div>
+      <div class="periodo-toggle">
+        <button class="pt-btn active" onclick="setPeriodo('mensual',this)">Mensual</button>
+        <button class="pt-btn" onclick="setPeriodo('anual',this)">Anual</button>
+      </div>
+    </div>
+    <div class="fam-grid" id="fam-grid"></div>
+  </div>
+
+  <div class="subtab" id="st-captura">
+    <div class="sec-title">Captura del día <span id="cap-fecha"></span></div>
+    <div id="cap-form"></div>
+    <div style="height:80px"></div>
+  </div>
+</div>
+
+<!-- ══ DIRECTOR ══ -->
+<div class="screen" id="screen-dir">
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showDirTab('dt-ranking',this)">Ranking MTY</button>
+    <button class="nav-tab" onclick="showDirTab('dt-capturas',this)">Capturas del día</button>
+    <button class="nav-tab" onclick="showDirTab('dt-regionales',this)">64 Regionales</button>
+  </div>
+
+  <div class="subtab active" id="dt-ranking">
+    <div class="view-hdr">
+      <div class="view-hdr-title">MTY Valle — Ranking EVI</div>
+      <div class="periodo-toggle">
+        <button class="pt-btn active" onclick="setDirPeriodo('mensual',this)">Mensual</button>
+        <button class="pt-btn" onclick="setDirPeriodo('anual',this)">Anual</button>
+      </div>
+    </div>
+    <div class="stats-row" id="dir-stats"></div>
+    <div class="sec-title">Top sucursales <span>por EVI</span></div>
+    <div class="rank-list" id="dir-ranking"></div>
+    <div class="sec-title">Detalle completo</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>#</th><th>CR · Sucursal</th>
+        <th class="r">EVI Archivo</th><th class="r">EVI + Hoy</th>
+        <th class="r">Cump %</th><th class="r">Capturó</th>
+      </tr></thead>
+      <tbody id="dir-tbody"></tbody>
+      <tfoot><tr>
+        <td colspan="2">Promedio MTY Valle</td>
+        <td class="r" id="dtf-arch">—</td>
+        <td class="r" id="dtf-hoy">—</td>
+        <td class="r" id="dtf-cump">—</td>
+        <td class="r" id="dtf-cap">—</td>
+      </tr></tfoot>
+    </table></div>
+  </div>
+
+  <div class="subtab" id="dt-capturas">
+    <div class="view-hdr">
+      <div class="sec-title" style="border:none;padding:0;margin:0">Capturas del día <span id="cap-count"></span></div>
+      <button class="btn-dl" onclick="descargarCSV()">⬇ Descargar CSV</button>
+    </div>
+    <div id="dir-cap-list"></div>
+  </div>
+
+  <div class="subtab" id="dt-regionales">
+    <div class="sec-title">64 Regionales — EVI Archivo Mensual</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Regional</th><th class="r">Sucursales</th><th class="r">EVI Prom.</th><th></th></tr></thead>
+      <tbody id="reg-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav" id="bnav">
+  <div class="bnav-items" id="bn-suc" style="display:none">
+    <button class="bni active" onclick="showSucTabMob('st-resumen',this)"><span class="bni-icon">📊</span>Resumen</button>
+    <button class="bni" onclick="showSucTabMob('st-familias',this)"><span class="bni-icon">📋</span>Familias</button>
+    <button class="bni" onclick="showSucTabMob('st-captura',this)"><span class="bni-icon">✏️</span>Captura</button>
+  </div>
+  <div class="bnav-items" id="bn-dir" style="display:none">
+    <button class="bni active" onclick="showDirTabMob('dt-ranking',this)"><span class="bni-icon">🏆</span>Ranking</button>
+    <button class="bni" onclick="showDirTabMob('dt-capturas',this)"><span class="bni-icon">✏️</span>Capturas</button>
+    <button class="bni" onclick="showDirTabMob('dt-regionales',this)"><span class="bni-icon">🗺️</span>Regionales</button>
+  </div>
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar" id="save-bar">
+  <div class="save-bar-msg">Captura sin guardar</div>
+  <div class="save-bar-actions">
+    <button class="btn-cancel-save" onclick="cancelarCambios()">Cancelar</button>
+    <button class="btn-save" onclick="guardarCaptura()">Guardar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONFIGURACIÓN — CAMBIA SOLO ESTAS LÍNEAS
+// ══════════════════════════════════════════════════════
+const GITHUB_USER   = 'agallegosbte';          // tu usuario de GitHub
+const GITHUB_REPO   = 'evi-plus';            // nombre del repositorio
+const GITHUB_BRANCH = 'main';
+const FILE_MENSUAL  = 'EVI_MENSUAL_SUCURSALES.xls';  // nombre exacto del archivo
+const FILE_ANUAL    = 'EVI_ANUAL_SUCURSALES.xls';
+const PASS_DIR      = 'mty2025';             // clave del director
+
+// URL base de los archivos en GitHub (raw)
+const RAW = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/datos/`;
+
+// ══════════════════════════════════════════════════════
+// FAMILIAS — mapeo columnas exactas del archivo
+// [id, nombre, col_pond, col_real, col_ppto, col_logro, acelerador]
+// ══════════════════════════════════════════════════════
+const FAMILIAS = [
+  ['CAP_VISTA',  'Cap Vista Total',        8,  4,  5, 10, true ],
+  ['FONDOS',     'Fondos de Inversión',   15, 11, 12, 17, true ],
+  ['PLAZO',      'Plazo',                 22, 18, 19, 24, true ],
+  ['CRED_PYME',  'Crédito PYME',          29, 25, 26, 30, false],
+  ['CREDINOMINA','Credinómina',            35, 31, 32, 36, false],
+  ['AUTO',       'Auto',                  41, 37, 38, 42, false],
+  ['TDC_RED',    'TDC Red',               47, 43, 44, 48, false],
+  ['HIPO',       'Hipo MYR+FVE',          53, 49, 50, 54, false],
+  ['SEGUROS',    'Seguros',               60, 55, 56, 61, false],
+  ['APERTURAS',  'Aperturas',             66, 62, 63, 67, false],
+  ['NOM_NVA',    'Nómina Nva Com-PyME',   72, 68, 69, 73, false],
+  ['NOM_ANT',    'Nómina Ant Com-PyME',   78, 74, 75, 79, false],
+  ['EMISORAS',   'Emisoras Com-PyME',     84, 80, 81, 85, false],
+  ['TPV',        'TPV Com-PyME',          90, 86, 87, 91, false],
+  ['PORTABILIDAD','Portabilidad',          96, 92, 93, 97, false],
+];
+
+const CRS_MTY = ['265','129','154','147','239','135','1039','1925','59',
+                 '161','1021','146','3749','123','584','1924','47','54'];
+
+// ══════════════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════════════
+let DATA = {mensual:{}, anual:{}, regionales:{}};
+let capturas    = {};   // {cr:{fid:valor}} — guardado en localStorage
+let borrador    = {};   // cambios actuales sin guardar
+let hayCambios  = false;
+let currentRole = 'suc';
+let currentCR   = null;
+let periodo     = 'mensual';
+let dirPeriodo  = 'mensual';
+
+// ══════════════════════════════════════════════════════
+// PARSER — lee el HTML del .xls del sistema
+// ══════════════════════════════════════════════════════
+function parsearXLS(content) {
+  const rows = [];
+  const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let mTr;
+  const trs = [];
+  while ((mTr = trRe.exec(content)) !== null) trs.push(mTr[1]);
+
+  for (let i = 3; i < trs.length; i++) {
+    const tds = [];
+    const tdRe = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+    let mTd;
+    while ((mTd = tdRe.exec(trs[i])) !== null)
+      tds.push(mTd[1].replace(/<[^>]+>/g,'').trim());
+    if (!tds[0] || !/^\d+$/.test(tds[0].trim())) continue;
+    rows.push(tds);
+  }
+  return rows;
+}
+
+function pN(s) {
+  if (!s || ['NA','N/A',''].includes(String(s).trim())) return 0;
+  return parseFloat(String(s).replace(/,/g,'').replace(/%/g,'')) || 0;
+}
+
+function buildData(rows) {
+  const out = {};
+  const regionales = {};
+  for (const r of rows) {
+    const cr = r[0]?.trim();
+    if (!cr) continue;
+    const fams = {};
+    for (const [fid,,pc,rc,pp,lc] of FAMILIAS) {
+      fams[fid] = {
+        pond:  pN(r[pc]),  real: pN(r[rc]),
+        ppto:  pN(r[pp]),  logro: pN(r[lc]),
+        cump:  pN(r[rc+2])
+      };
+    }
+    out[cr] = {
+      cr, nombre: r[1]||'', regional: r[2]||'', territorial: r[3]||'',
+      evi_rango: pN(r[98]), evi_pond: pN(r[99]),
+      evi_logro: pN(r[100]), evi_total: pN(r[101]),
+      familias: fams
+    };
+    // Acumular regionales
+    const reg = r[2]||'';
+    if (!regionales[reg]) regionales[reg] = {count:0, evi_sum:0, evi_n:0};
+    regionales[reg].count++;
+    const ev = pN(r[101]);
+    if (ev > 0) { regionales[reg].evi_sum += ev; regionales[reg].evi_n++; }
+  }
+  return {out, regionales};
+}
+
+// ══════════════════════════════════════════════════════
+// CARGA DESDE GITHUB
+// ══════════════════════════════════════════════════════
+async function cargarArchivo(nombre, etiqueta) {
+  setLoader(`Cargando ${etiqueta}...`);
+  const url = RAW + encodeURIComponent(nombre) + '?t=' + Date.now();
+  try {
+    const r = await fetch(url, {cache:'no-store'});
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const text = await r.text();
+    return text;
+  } catch(e) {
+    console.warn(`Error cargando ${nombre}:`, e);
+    return null;
+  }
+}
+
+async function inicializar() {
+  setSyncStatus('loading');
+
+  // Cargar mensual
+  const txtMen = await cargarArchivo(FILE_MENSUAL, 'EVI Mensual');
+  if (txtMen) {
+    const {out, regionales} = buildData(parsearXLS(txtMen));
+    DATA.mensual = out;
+    DATA.regionales = regionales;
+  }
+
+  // Cargar anual
+  const txtAnu = await cargarArchivo(FILE_ANUAL, 'EVI Anual');
+  if (txtAnu) {
+    const {out} = buildData(parsearXLS(txtAnu));
+    DATA.anual = out;
+  }
+
+  // Cargar capturas guardadas desde GitHub (JSON)
+  const capTxt = await cargarCapturaGitHub();
+  if (capTxt) {
+    try { capturas = JSON.parse(capTxt); } catch(e) { capturas = {}; }
+  }
+
+  // Cargar capturas locales también (merge)
+  try {
+    const local = localStorage.getItem('evi_plus_cap');
+    if (local) {
+      const localObj = JSON.parse(local);
+      // Merge: local tiene prioridad para las sucursales MTY
+      for (const [cr, vals] of Object.entries(localObj)) {
+        capturas[cr] = {...(capturas[cr]||{}), ...vals};
+      }
+    }
+  } catch(e) {}
+
+  if (Object.keys(DATA.mensual).length === 0 && Object.keys(DATA.anual).length === 0) {
+    setSyncStatus('err');
+    setLoader('No se pudo cargar el archivo. Verifica la configuración de GitHub.', true);
+    return;
+  }
+
+  setSyncStatus('ok');
+  poblarSelect();
+  ocultarLoader();
+}
+
+async function cargarCapturaGitHub() {
+  const url = RAW + 'capturas.json?t=' + Date.now();
+  try {
+    const r = await fetch(url, {cache:'no-store'});
+    if (!r.ok) return null;
+    return await r.text();
+  } catch(e) { return null; }
+}
+
+// ══════════════════════════════════════════════════════
+// GUARDAR CAPTURAS
+// Guarda en localStorage (siempre) + genera JSON para descarga manual
+// ══════════════════════════════════════════════════════
+function guardarCaptura() {
+  // Merge borrador en capturas
+  for (const [cr, vals] of Object.entries(borrador)) {
+    capturas[cr] = {...(capturas[cr]||{}), ...vals};
+  }
+  borrador = {};
+  hayCambios = false;
+
+  // Guardar local
+  try { localStorage.setItem('evi_plus_cap', JSON.stringify(capturas)); } catch(e) {}
+
+  document.getElementById('save-bar').classList.remove('on');
+  showToast('Captura guardada ✓');
+  renderSucursal();
+}
+
+function cancelarCambios() {
+  borrador = {}; hayCambios = false;
+  document.getElementById('save-bar').classList.remove('on');
+  renderCaptura();
+}
+
+// ══════════════════════════════════════════════════════
+// UTILIDADES
+// ══════════════════════════════════════════════════════
+function fmtN(v, d=2) {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  return v.toLocaleString('es-MX', {minimumFractionDigits:d, maximumFractionDigits:d});
+}
+function fmtP(v) {
+  if (v === null || isNaN(v)) return '—';
+  return v.toFixed(1) + '%';
+}
+function chipCls(v) {
+  if (v === null) return 'cgr';
+  if (v >= 100) return 'cg';
+  if (v >= 85)  return 'cg';
+  if (v >= 60)  return 'ca';
+  return 'cr';
+}
+function barClr(v) {
+  if (v >= 85) return '#15803D';
+  if (v >= 60) return '#D97706';
+  return '#DC2626';
+}
+function eviClr(v) {
+  if (v >= 80) return '#15803D';
+  if (v >= 60) return '#D97706';
+  return '#DC2626';
+}
+function diasHabilesRestantes() {
+  const hoy = new Date();
+  const fin  = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0);
+  let d = 0; let c = new Date(hoy); c.setDate(c.getDate()+1);
+  while (c <= fin) { const dw=c.getDay(); if(dw!==0&&dw!==6) d++; c.setDate(c.getDate()+1); }
+  return d;
+}
+function diasDelMes()  { const n=new Date(); return new Date(n.getFullYear(),n.getMonth()+1,0).getDate(); }
+function diaActual()   { return new Date().getDate(); }
+
+function setLoader(msg, error=false) {
+  document.getElementById('loader').style.display='flex';
+  document.getElementById('loader-msg').textContent=msg;
+  if (error) document.getElementById('loader-msg').style.color='#DC2626';
+}
+function ocultarLoader() { document.getElementById('loader').style.display='none'; }
+function setSyncStatus(s) {
+  const dot=document.getElementById('sync-dot');
+  dot.className='sync-dot '+s;
+}
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════════════════
+// LOGIN / LOGOUT
+// ══════════════════════════════════════════════════════
+function poblarSelect() {
+  const sel = document.getElementById('sel-cr');
+  CRS_MTY.forEach(cr => {
+    const d = DATA.mensual[cr] || DATA.anual[cr];
+    if (d) sel.innerHTML += `<option value="${cr}">${cr} · ${d.nombre}</option>`;
+  });
+}
+
+function setRole(r) {
+  currentRole = r;
+  document.getElementById('rtab-suc').className = 'role-tab'+(r==='suc'?' active':'');
+  document.getElementById('rtab-dir').className = 'role-tab'+(r==='dir'?' active':'');
+  document.getElementById('form-suc').style.display = r==='suc'?'block':'none';
+  document.getElementById('form-dir').style.display = r==='dir'?'block':'none';
+}
+
+function doLogin() {
+  if (currentRole === 'suc') {
+    const cr = document.getElementById('sel-cr').value;
+    if (!cr) { showToast('Selecciona tu sucursal'); return; }
+    currentCR = cr;
+    showScreen('suc');
+    renderSucursal();
+  } else {
+    if (document.getElementById('inp-pass').value !== PASS_DIR) { showToast('Clave incorrecta'); return; }
+    showScreen('dir');
+    renderDirector();
+  }
+}
+
+function logout() {
+  currentCR=null; borrador={}; hayCambios=false;
+  document.getElementById('save-bar').classList.remove('on');
+  document.getElementById('bnav').style.display='none';
+  document.getElementById('btn-logout').style.display='none';
+  showScreen('login');
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if (name !== 'login') {
+    document.getElementById('btn-logout').style.display='block';
+    document.getElementById('bnav').style.display='block';
+    document.getElementById('bn-suc').style.display = name==='suc'?'flex':'none';
+    document.getElementById('bn-dir').style.display = name==='dir'?'flex':'none';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════
+function showSucTab(id, btn) {
+  document.querySelectorAll('#screen-suc .subtab').forEach(s=>{s.classList.remove('active'); s.style.display='none';});
+  document.getElementById(id).classList.add('active'); document.getElementById(id).style.display='block';
+  document.querySelectorAll('#screen-suc .nav-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(id==='st-captura') renderCaptura();
+}
+function showSucTabMob(id,btn){
+  showSucTab(id,null);
+  document.querySelectorAll('#bn-suc .bni').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+function showDirTab(id,btn){
+  document.querySelectorAll('#screen-dir .subtab').forEach(s=>{s.classList.remove('active');s.style.display='none';});
+  document.getElementById(id).classList.add('active'); document.getElementById(id).style.display='block';
+  document.querySelectorAll('#screen-dir .nav-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+function showDirTabMob(id,btn){
+  showDirTab(id,null);
+  document.querySelectorAll('#bn-dir .bni').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// PERIODO
+// ══════════════════════════════════════════════════════
+function setPeriodo(p,btn){
+  periodo=p;
+  document.querySelectorAll('#screen-suc .periodo-toggle .pt-btn').forEach(b=>{
+    b.className='pt-btn'+(b===btn?' active':'');
+  });
+  renderSucursal();
+}
+function setDirPeriodo(p,btn){
+  dirPeriodo=p;
+  document.querySelectorAll('#screen-dir .periodo-toggle .pt-btn').forEach(b=>{
+    b.className='pt-btn'+(b===btn?' active':'');
+  });
+  renderDirector();
+}
+
+// ══════════════════════════════════════════════════════
+// CALCULAR EVI CON CAPTURA
+// ══════════════════════════════════════════════════════
+function calcEviHoy(cr, p) {
+  const d = (p==='mensual'?DATA.mensual:DATA.anual)[cr];
+  if (!d) return 0;
+  const cap = {...(capturas[cr]||{}), ...(borrador[cr]||{})};
+  let evi = 0;
+  FAMILIAS.forEach(([fid,,pc,rc,pp,,acel]) => {
+    const f = d.familias[fid]; if (!f || !f.pond) return;
+    const hoy    = cap[fid] || 0;
+    const rtotal = f.real + hoy;
+    const cump   = f.ppto > 0 ? (rtotal / f.ppto) * 100 : 0;
+    const logro  = acel
+      ? (cump>=90 ? f.pond*(1+Math.min((cump-90)/100,0.5)) : cump>=80 ? f.pond*(cump/100) : 0)
+      : (cump>=80 ? f.pond*(Math.min(cump,150)/100) : 0);
+    evi += logro;
+  });
+  return evi;
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER SUCURSAL
+// ══════════════════════════════════════════════════════
+function renderSucursal() {
+  const cr = currentCR;
+  const d  = (periodo==='mensual'?DATA.mensual:DATA.anual)[cr];
+  if (!d) return;
+
+  document.getElementById('suc-title').textContent = `CR ${cr} — ${d.nombre}`;
+
+  // Gauge
+  const eviT = d.evi_total;
+  const arc  = document.getElementById('evi-arc');
+  arc.style.strokeDashoffset = (175.9*(1-Math.min(eviT/100,1))).toFixed(1);
+  arc.style.stroke = eviClr(eviT);
+  document.getElementById('evi-num').textContent = fmtP(eviT);
+  document.getElementById('evi-num').style.color  = eviClr(eviT);
+  document.getElementById('evi-sub').textContent  = periodo==='mensual'?'EVI Mensual':'EVI Anual';
+  document.getElementById('evi-rango').textContent = fmtP(d.evi_rango);
+  document.getElementById('evi-pond').textContent  = fmtP(d.evi_pond);
+  document.getElementById('evi-logro').textContent = fmtP(d.evi_logro);
+
+  const famsOk  = Object.values(d.familias).filter(f=>f.cump>=85).length;
+  const famsTot = Object.values(d.familias).filter(f=>f.ppto>0).length;
+  const eviHoy  = calcEviHoy(cr, periodo);
+
+  document.getElementById('suc-stats').innerHTML = `
+    <div class="stat-card">
+      <div class="sc-lbl">Familias al meta</div>
+      <div class="sc-val" style="color:${famsOk>=10?'var(--green)':'var(--amber)'}">${famsOk}<span style="font-size:14px;color:var(--text3)">/${famsTot}</span></div>
+      <div class="sc-sub">≥ 85% cumplimiento</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-lbl">EVI + Hoy</div>
+      <div class="sc-val" style="color:${eviClr(eviHoy)}">${fmtP(eviHoy)}</div>
+      <div class="sc-sub">con captura del día</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-lbl">Pond. disponible</div>
+      <div class="sc-val">${fmtP(d.evi_pond)}</div>
+      <div class="sc-sub">máximo alcanzable</div>
+    </div>`;
+
+  renderFamilias(d, cr);
+}
+
+function renderFamilias(d, cr) {
+  const cap = {...(capturas[cr]||{}), ...(borrador[cr]||{})};
+  let html = '';
+  FAMILIAS.forEach(([fid,,,,,,acel]) => {
+    const f = d.familias[fid]; if (!f) return;
+    const hoy    = cap[fid] || 0;
+    const rtotal = f.real + hoy;
+    const cump   = f.ppto > 0 ? (rtotal/f.ppto)*100 : 0;
+    const isCap  = fid === 'CAP_VISTA';
+
+    html += `
+    <div class="fam-card" id="fc-${fid}">
+      <div class="fam-hdr" onclick="toggleFam('${fid}')">
+        <div class="fam-name">${isCap?'💧 ':''}${f.nombre||fid}</div>
+        <div class="fam-right">
+          <div class="fam-pond">${f.pond>0?f.pond+'%':'—'}</div>
+          <span class="chip ${chipCls(cump)}">${fmtP(cump)}</span>
+          <span class="fam-chev">▾</span>
+        </div>
+      </div>
+      <div class="fam-prog"><div class="fam-prog-fill" style="width:${Math.min(cump,100)}%;background:${barClr(cump)}"></div></div>
+      <div class="fam-body">
+        <div class="fam-dg">
+          <div><div class="fdi-lbl">PPTO</div><div class="fdi-val">${fmtN(f.ppto)}</div></div>
+          <div><div class="fdi-lbl">Real acum.</div><div class="fdi-val">${fmtN(f.real)}</div></div>
+          <div><div class="fdi-lbl">Hoy capturado</div><div class="fdi-val" style="color:var(--accent)">${fmtN(hoy)}</div></div>
+          <div><div class="fdi-lbl">Real total</div><div class="fdi-val">${fmtN(rtotal)}</div></div>
+          <div><div class="fdi-lbl">Logro archivo</div><div class="fdi-val">${fmtP(f.logro)}</div></div>
+          ${acel?'<div><div class="fdi-lbl">Acelerador</div><div class="fdi-val" style="color:var(--green)">✓ Aplica</div></div>':''}
+        </div>
+        ${isCap ? renderProyeccionCapVista(f, hoy) : ''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('fam-grid').innerHTML = html;
+}
+
+function renderProyeccionCapVista(f, hoy) {
+  const diasT = diasDelMes(), diaH = diaActual(), diasR = diasHabilesRestantes();
+  const pptoDia = f.ppto / diasT;
+  const nuevoR  = f.real + hoy;
+  const faltante = Math.max(0, f.ppto - nuevoR);
+  const porDia   = diasR > 0 ? faltante / diasR : 0;
+  const newCump  = f.ppto > 0 ? (nuevoR/f.ppto)*100 : 0;
+  return `
+  <div class="cap-box rojo">
+    <div class="cap-box-title">💧 Proyección al cierre de mes</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.9">
+      <div>Día ${diaH} de ${diasT} · <strong>${diasR}</strong> días hábiles restantes</div>
+      <div>PPTO diario promedio: <strong>${fmtN(pptoDia)}</strong></div>
+      <div>Cumplimiento proyectado: <strong style="color:${barClr(newCump)}">${fmtP(newCump)}</strong></div>
+      <div>Faltante al meta: <strong style="color:var(--red)">${fmtN(faltante)}</strong></div>
+      <div>Necesario por día restante: <strong style="color:var(--amber)">${fmtN(porDia)}</strong></div>
+    </div>
+  </div>`;
+}
+
+function toggleFam(fid) {
+  document.getElementById('fc-'+fid).classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════════════
+// CAPTURA
+// ══════════════════════════════════════════════════════
+function renderCaptura() {
+  const cr = currentCR;
+  const d  = DATA.mensual[cr]; if (!d) return;
+  const cap = {...(capturas[cr]||{}), ...(borrador[cr]||{})};
+  const diasR = diasHabilesRestantes();
+  const diaH  = diaActual(), diasT = diasDelMes();
+
+  document.getElementById('cap-fecha').textContent =
+    new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+
+  let html = '';
+  FAMILIAS.forEach(([fid,,,,,,acel]) => {
+    const f = d.familias[fid]; if (!f || !f.ppto) return;
+    const hoy    = cap[fid] || 0;
+    const rtotal = f.real + hoy;
+    const cump   = f.ppto > 0 ? (rtotal/f.ppto)*100 : 0;
+    const isCap  = fid === 'CAP_VISTA';
+
+    let proyHtml = '';
+    if (isCap) {
+      const faltante = Math.max(0, f.ppto - rtotal);
+      const porDia   = diasR > 0 ? faltante/diasR : 0;
+      proyHtml = `
+      <div class="cap-result" id="proj-${fid}">
+        <div class="cap-result-row"><span>Nuevo acumulado</span><span>${fmtN(rtotal)}</span></div>
+        <div class="cap-result-row"><span>Cump. proyectado</span><span style="color:${barClr(cump)}">${fmtP(cump)}</span></div>
+        <div class="cap-result-row"><span>Faltante al meta</span><span>${fmtN(faltante)}</span></div>
+        <div class="cap-result total"><span>Necesario / día restante</span><span style="color:var(--amber)">${fmtN(porDia)}</span></div>
+      </div>
+      <div class="cap-proy-note">Día ${diaH} de ${diasT} · ${diasR} días hábiles restantes</div>`;
+    }
+
+    html += `
+    <div class="fam-card" style="margin-bottom:8px">
+      <div class="fam-hdr" style="cursor:default">
+        <div class="fam-name">${isCap?'💧 ':''}${f.nombre||fid}</div>
+        <div class="fam-right">
+          <div class="fam-pond">${f.pond}%</div>
+          <span class="chip ${chipCls(cump)}">${fmtP(cump)}</span>
+        </div>
+      </div>
+      <div class="fam-body" style="display:block">
+        <div class="fam-dg" style="margin-bottom:10px">
+          <div><div class="fdi-lbl">Real acum.</div><div class="fdi-val">${fmtN(f.real)}</div></div>
+          <div><div class="fdi-lbl">PPTO</div><div class="fdi-val">${fmtN(f.ppto)}</div></div>
+        </div>
+        <div class="cap-box ${isCap?'rojo':'gris'}">
+          <div class="cap-box-title">${isCap?'💧 ':''}Colocado hoy</div>
+          <input class="cap-inp" type="number" min="0" step="any" inputmode="decimal"
+            id="ci-${fid}" value="${hoy||''}" placeholder="0"
+            oninput="onInput('${fid}','${cr}',${isCap})">
+          ${proyHtml}
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('cap-form').innerHTML = html;
+}
+
+function onInput(fid, cr, isCap) {
+  const val = parseFloat(document.getElementById('ci-'+fid).value) || 0;
+  if (!borrador[cr]) borrador[cr] = {};
+  borrador[cr][fid] = val;
+  hayCambios = true;
+  document.getElementById('save-bar').classList.add('on');
+
+  if (isCap) {
+    const f = DATA.mensual[cr]?.familias[fid]; if (!f) return;
+    const cap = {...(capturas[cr]||{}), ...(borrador[cr]||{})};
+    const rtotal  = f.real + val;
+    const cump    = f.ppto>0?(rtotal/f.ppto)*100:0;
+    const diasR   = diasHabilesRestantes();
+    const faltante = Math.max(0, f.ppto - rtotal);
+    const porDia   = diasR>0?faltante/diasR:0;
+    const el = document.getElementById('proj-'+fid);
+    if (el) el.innerHTML = `
+      <div class="cap-result-row"><span>Nuevo acumulado</span><span>${fmtN(rtotal)}</span></div>
+      <div class="cap-result-row"><span>Cump. proyectado</span><span style="color:${barClr(cump)}">${fmtP(cump)}</span></div>
+      <div class="cap-result-row"><span>Faltante al meta</span><span>${fmtN(faltante)}</span></div>
+      <div class="cap-result total"><span>Necesario / día restante</span><span style="color:var(--amber)">${fmtN(porDia)}</span></div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER DIRECTOR
+// ══════════════════════════════════════════════════════
+function renderDirector() {
+  const p   = dirPeriodo;
+  const src = p==='mensual' ? DATA.mensual : DATA.anual;
+
+  const sucs = CRS_MTY.map(cr => {
+    const d = src[cr]; if (!d) return null;
+    const cap = capturas[cr] || {};
+    const tieneCap = Object.values(cap).some(v=>v>0);
+    const eviHoy   = calcEviHoy(cr, p);
+    let tP=0, tR=0, tH=0;
+    FAMILIAS.forEach(([fid,,pc,rc,pp]) => {
+      const f = d.familias[fid]; if (!f) return;
+      tP += f.ppto; tR += f.real; tH += cap[fid]||0;
+    });
+    const cump = tP>0?((tR+tH)/tP)*100:0;
+    return {cr, nombre:d.nombre, eviArch:d.evi_total, eviHoy, cump, tieneCap, tH};
+  }).filter(Boolean).sort((a,b)=>(b.tieneCap?b.eviHoy:b.eviArch)-(a.tieneCap?a.eviHoy:a.eviArch));
+
+  const conCap    = sucs.filter(s=>s.tieneCap).length;
+  const avgArch   = sucs.reduce((a,s)=>a+s.eviArch,0)/sucs.length;
+  const avgHoy    = sucs.reduce((a,s)=>a+(s.tieneCap?s.eviHoy:s.eviArch),0)/sucs.length;
+  const avgCump   = sucs.reduce((a,s)=>a+s.cump,0)/sucs.length;
+
+  // Stats
+  document.getElementById('dir-stats').innerHTML = `
+    <div class="stat-card"><div class="sc-lbl">Capturaron hoy</div>
+      <div class="sc-val">${conCap}<span style="font-size:14px;color:var(--text3)">/${sucs.length}</span></div>
+      <div class="sc-sub">sucursales MTY Valle</div></div>
+    <div class="stat-card"><div class="sc-lbl">EVI Archivo prom.</div>
+      <div class="sc-val" style="color:${eviClr(avgArch)}">${fmtP(avgArch)}</div>
+      <div class="sc-sub">${p}</div></div>
+    <div class="stat-card"><div class="sc-lbl">EVI + Hoy prom.</div>
+      <div class="sc-val" style="color:${eviClr(avgHoy)}">${fmtP(avgHoy)}</div>
+      <div class="sc-sub">con capturas del día</div></div>`;
+
+  // Ranking top 10
+  let rkHtml = '';
+  sucs.slice(0,10).forEach((s,i) => {
+    const eviM = s.tieneCap ? s.eviHoy : s.eviArch;
+    const nc   = i===0?'g1':i===1?'g2':i===2?'g3':'';
+    rkHtml += `<div class="rank-item">
+      <div class="rank-n ${nc}">${i+1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${s.nombre}</div>
+        <div class="rank-cr">CR ${s.cr}${s.tieneCap?' · capturó hoy':''}</div>
+        <div class="rank-bw"><div class="rank-bf" style="width:${Math.min(eviM,100)}%;background:${barClr(eviM)}"></div></div>
+      </div>
+      <div class="rank-evi" style="color:${eviClr(eviM)}">${fmtP(eviM)}</div>
+    </div>`;
+  });
+  document.getElementById('dir-ranking').innerHTML = rkHtml;
+
+  // Tabla
+  let tbHtml = '';
+  sucs.forEach((s,i) => {
+    const eviM = s.tieneCap ? s.eviHoy : s.eviArch;
+    tbHtml += `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${i+1}</td>
+      <td><strong>CR ${s.cr}</strong> · ${s.nombre}</td>
+      <td class="r"><span class="chip ${chipCls(s.eviArch)}">${fmtP(s.eviArch)}</span></td>
+      <td class="r"><span class="chip ${chipCls(eviM)}">${fmtP(eviM)}</span></td>
+      <td class="r">${fmtP(s.cump)}</td>
+      <td class="r">${s.tieneCap?'<span class="chip cg">Sí</span>':'<span class="chip cgr">—</span>'}</td>
+    </tr>`;
+  });
+  document.getElementById('dir-tbody').innerHTML = tbHtml;
+  document.getElementById('dtf-arch').textContent = fmtP(avgArch);
+  document.getElementById('dtf-hoy').textContent  = fmtP(avgHoy);
+  document.getElementById('dtf-cump').textContent  = fmtP(avgCump);
+  document.getElementById('dtf-cap').textContent   = `${conCap}/${sucs.length}`;
+
+  // Capturas del día
+  document.getElementById('cap-count').textContent = `${conCap} de ${sucs.length}`;
+  let capHtml = '';
+  sucs.forEach(s => {
+    if (!s.tieneCap) {
+      capHtml += `<div class="fam-card" style="margin-bottom:8px;opacity:.45">
+        <div class="fam-hdr" style="cursor:default">
+          <div class="fam-name">CR ${s.cr} · ${s.nombre}</div>
+          <span class="chip cgr">Sin captura</span>
+        </div></div>`;
+      return;
+    }
+    const cap  = capturas[s.cr]||{};
+    const dSrc = src[s.cr];
+    let rows = '';
+    FAMILIAS.forEach(([fid]) => {
+      const v = cap[fid]||0; if(!v) return;
+      rows += `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--text2)">${dSrc?.familias[fid]?.nombre||fid}</span>
+        <span style="font-family:'DM Mono',monospace;font-weight:600">${fmtN(v)}</span>
+      </div>`;
+    });
+    capHtml += `<div class="fam-card" style="margin-bottom:8px">
+      <div class="fam-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <div class="fam-name">CR ${s.cr} · ${s.nombre}</div>
+        <div class="fam-right">
+          <span class="chip" style="background:var(--accent-soft);color:var(--accent)">EVI ${fmtP(s.eviHoy)}</span>
+          <span class="chip cg">Capturó</span>
+          <span class="fam-chev">▾</span>
+        </div>
+      </div>
+      <div class="fam-body" style="display:none">${rows}</div>
+    </div>`;
+  });
+  document.getElementById('dir-cap-list').innerHTML = capHtml || '<div class="empty">Sin capturas registradas hoy</div>';
+
+  // Regionales
+  const regs = Object.entries(DATA.regionales)
+    .map(([r,v])=>({r, count:v.count, evi:v.evi_n>0?v.evi_sum/v.evi_n:0}))
+    .sort((a,b)=>b.evi-a.evi);
+  let regHtml = '';
+  regs.forEach((x,i) => {
+    const isMty = x.r === 'MTY VALLE';
+    regHtml += `<tr style="${isMty?'background:#FFFBF0;font-weight:600':''}">
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${i+1}</td>
+      <td>${isMty?'<span class="reg-mty">★ Tuya</span>':''}${x.r}</td>
+      <td class="r">${x.count}</td>
+      <td class="r"><span class="chip ${chipCls(x.evi)}">${fmtP(x.evi)}</span></td>
+      <td style="width:100px"><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(x.evi,100)}%;background:${barClr(x.evi)};border-radius:2px"></div>
+      </div></td>
+    </tr>`;
+  });
+  document.getElementById('reg-tbody').innerHTML = regHtml;
+}
+
+// ══════════════════════════════════════════════════════
+// DESCARGAR CSV (director)
+// ══════════════════════════════════════════════════════
+function descargarCSV() {
+  const fecha = new Date().toLocaleDateString('es-MX').replace(/\//g,'-');
+  let csv = 'FECHA,CR,SUCURSAL,FAMILIA,COLOCADO_HOY\n';
+  CRS_MTY.forEach(cr => {
+    const cap = capturas[cr]||{};
+    const d   = DATA.mensual[cr];
+    if (!Object.values(cap).some(v=>v>0)) return;
+    FAMILIAS.forEach(([fid]) => {
+      const v = cap[fid]||0; if (!v) return;
+      const nom = d?.familias[fid]?.nombre||fid;
+      const suc = d?.nombre||cr;
+      csv += `${fecha},${cr},"${suc}","${nom}",${v}\n`;
+    });
+  });
+
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `EVI_Capturas_${fecha}.csv`;
+  a.click();
+  showToast('CSV descargado ✓');
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+document.getElementById('tb-date').textContent =
+  new Date().toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+
+document.getElementById('inp-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('sel-cr').addEventListener('keydown',  e => { if(e.key==='Enter') doLogin(); });
+
+// Arrancar carga de datos
+inicializar();
+</script>
+</body>
+</html>
