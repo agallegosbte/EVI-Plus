@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>EVI Plus — MTY Valle</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F7F7F5;--sur:#FFF;--sur2:#F0F0EC;--bor:#E4E4DF;
+  --tx:#1A1A18;--tx2:#6B6B66;--tx3:#A0A09A;
+  --acc:#8B1A1A;--acc-s:#F9F0F0;
+  --gn:#15803D;--gn-s:#DCFCE7;
+  --am:#B45309;--am-s:#FEF3C7;
+  --rd:#DC2626;--rd-s:#FEE2E2;
+  --nv:#2C2C2C;--nv-s:#F0EDED;
+  --r:10px;--rs:6px;
+  --sh:0 1px 3px rgba(0,0,0,.08);
+  --shm:0 4px 12px rgba(0,0,0,.08);
+}
+*{font-family:'Inter',sans-serif}
+body{background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px}
+button{cursor:pointer}
+
+/* TOPBAR */
+.tb{background:var(--nv);color:#fff;padding:0 18px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.tb-l{display:flex;align-items:center;gap:10px}
+.tb-logo{width:30px;height:30px;background:linear-gradient(135deg,#B22222,#7B0000);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff}
+.tb-name{font-weight:700;font-size:15px;letter-spacing:-.3px}
+.tb-tag{font-size:10px;background:rgba(255,255,255,.1);padding:2px 8px;border-radius:20px;color:rgba(255,255,255,.6);margin-left:4px}
+.tb-r{display:flex;align-items:center;gap:8px}
+.tb-date{font-size:11px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+.btn-out{padding:5px 11px;border:1px solid rgba(255,255,255,.15);border-radius:var(--rs);background:none;color:rgba(255,255,255,.6);font-size:11px;transition:all .15s}
+.btn-out:hover{background:rgba(255,255,255,.08);color:#fff}
+
+/* LOADER */
+.loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;gap:14px}
+.spin{width:36px;height:36px;border:3px solid var(--bor);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loader-msg{font-size:13px;color:var(--tx2);text-align:center;max-width:280px}
+
+/* SCREENS */
+.scr{display:none;min-height:calc(100vh - 52px);padding:20px}
+.scr.on{display:block}
+
+/* LOGIN */
+.lw{max-width:360px;margin:50px auto 0}
+.lc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:28px;box-shadow:var(--shm)}
+.lh{text-align:center;margin-bottom:24px}
+.lic{width:50px;height:50px;background:linear-gradient(135deg,#B22222,#7B0000);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#fff;font-size:22px}
+.lt{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:3px}
+.ls{font-size:12px;color:var(--tx2)}
+.rtabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px}
+.rtab{padding:10px;border:1.5px solid var(--bor);border-radius:var(--rs);background:var(--sur);font-size:13px;font-weight:500;color:var(--tx2);transition:all .15s;text-align:center}
+.rtab.on{border-color:var(--acc);background:var(--acc-s);color:var(--acc)}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase}
+.fg select,.fg input{width:100%;border:1.5px solid var(--bor);border-radius:var(--rs);padding:10px 12px;font-size:14px;background:var(--sur);color:var(--tx);outline:none;transition:border-color .15s}
+.fg select:focus,.fg input:focus{border-color:var(--acc)}
+.btn-en{width:100%;padding:12px;background:var(--nv);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;margin-top:4px;transition:background .15s}
+.btn-en:hover{background:#1a1a1a}
+.ln{text-align:center;font-size:11px;color:var(--tx3);margin-top:14px}
+
+/* UPLOAD ZONE */
+.up-zone{border:2px dashed var(--bor);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:var(--sur);margin-bottom:14px}
+.up-zone:hover,.up-zone.drag{border-color:var(--acc);background:var(--acc-s)}
+.up-zone input{display:none}
+.up-icon{font-size:32px;margin-bottom:8px}
+.up-title{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);margin-bottom:4px}
+.up-sub{font-size:11px;color:var(--tx2)}
+.up-st{margin-top:10px;font-size:12px;padding:7px 14px;border-radius:4px;display:none}
+.up-ok{background:rgba(21,128,61,.15);color:var(--gn);display:block!important}
+.up-err{background:rgba(220,38,38,.15);color:var(--rd);display:block!important}
+.pb{height:4px;background:var(--bor);border-radius:2px;margin-top:8px;display:none}
+.pbf{height:100%;background:var(--acc);border-radius:2px;width:0;transition:width .3s}
+
+/* PANEL */
+.panel{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:var(--sh)}
+.panel h2{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:4px}
+.panel p{font-size:12px;color:var(--tx2);margin-bottom:14px;line-height:1.5}
+
+/* TABS */
+.ntabs{display:flex;border-bottom:1px solid var(--bor);margin:-20px -20px 20px;padding:0 20px;background:var(--sur);overflow-x:auto}
+.ntab{padding:14px 16px;font-size:13px;font-weight:500;color:var(--tx2);border:none;background:none;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.ntab.on{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+
+/* STATS */
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.sc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
+.sc-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:4px}
+.sc-v{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.sc-s{font-size:11px;color:var(--tx3);margin-top:3px}
+
+/* EVI HERO */
+.eh{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;box-shadow:var(--sh)}
+.ei{flex:1}
+.el{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:2px}
+.en{font-size:34px;font-weight:700;letter-spacing:-1px;line-height:1}
+.es{font-size:12px;color:var(--tx2);margin-top:3px}
+.eb{display:flex;gap:4px;margin-top:10px}
+.ebi{flex:1;text-align:center}
+.ebi-l{font-size:9px;color:var(--tx3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.3px}
+.ebi-v{font-size:13px;font-weight:600;font-family:'DM Mono',monospace}
+
+/* PERIODO */
+.pt{display:flex;background:var(--sur2);border:1px solid var(--bor);border-radius:var(--rs);padding:3px;gap:2px;width:fit-content}
+.ptb{padding:6px 14px;border-radius:5px;border:none;background:none;font-size:12px;font-weight:500;color:var(--tx2);transition:all .15s}
+.ptb.on{background:var(--nv);color:#fff;box-shadow:var(--sh)}
+
+/* VIEW HDR */
+.vh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.vh-t{font-size:15px;font-weight:700;letter-spacing:-.3px}
+
+/* FAM CARDS */
+.fg-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.fc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.fc-h{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.fc-n{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px}
+.fc-r{display:flex;align-items:center;gap:8px}
+.fc-p{font-size:11px;color:var(--tx2);font-family:'DM Mono',monospace}
+.fc-ch{color:var(--tx3);font-size:10px;transition:transform .2s}
+.fc.open .fc-ch{transform:rotate(180deg)}
+.fc-pg{height:3px;background:var(--bor)}
+.fc-pgf{height:100%;border-radius:2px;transition:width .5s}
+.fc-b{display:none;padding:12px 14px;border-top:1px solid var(--bor);background:var(--bg)}
+.fc.open .fc-b{display:block}
+.fd{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.fdi-l{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px}
+.fdi-v{font-size:13px;font-weight:600;font-family:'DM Mono',monospace}
+
+/* CAP BOX */
+.cb{border-radius:var(--rs);padding:12px;margin-top:6px}
+.cb-r{background:#FDF5F5;border:1px solid #F0CECE}
+.cb-g{background:var(--acc-s);border:1px solid #E8D4D4}
+.cb-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;color:var(--acc)}
+.ci{border:1.5px solid #D4A0A0;border-radius:var(--rs);padding:9px 11px;font-size:14px;font-family:'DM Mono',monospace;background:#fff;color:var(--tx);outline:none;width:100%;transition:border-color .15s}
+.ci:focus{border-color:var(--acc)}
+.cr-box{background:#fff;border:1px solid #E8D0D0;border-radius:var(--rs);padding:10px 12px;margin-top:8px}
+.cr-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--tx2);padding:2px 0}
+.cr-row.tot{font-weight:600;color:var(--tx);font-size:13px;border-top:1px solid var(--bor);margin-top:4px;padding-top:6px}
+.cp-note{font-size:11px;color:var(--tx3);margin-top:6px;font-style:italic}
+
+/* TABLA */
+.tw{overflow-x:auto;border:1px solid var(--bor);border-radius:var(--r);background:var(--sur);box-shadow:var(--sh);margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--nv);color:rgba(255,255,255,.8);font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:9px 10px;text-align:left;white-space:nowrap}
+thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--bor);transition:background .1s}
+tbody tr:hover{background:var(--bg)}
+tbody tr.hl{background:#FFFBF0}
+tbody td{padding:8px 10px;vertical-align:middle}
+tbody td.r{text-align:right;font-family:'DM Mono',monospace}
+tfoot td{background:var(--sur2);border-top:2px solid var(--bor);font-weight:600;padding:8px 10px;font-size:12px}
+tfoot td.r{text-align:right;font-family:'DM Mono',monospace}
+
+/* CHIPS */
+.chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;white-space:nowrap}
+.cg{background:var(--gn-s);color:var(--gn)}
+.ca{background:var(--am-s);color:var(--am)}
+.cr2{background:var(--rd-s);color:var(--rd)}
+.cgr{background:var(--sur2);color:var(--tx2)}
+
+/* RANKING */
+.rl{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.ri{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rs);padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
+.rn{width:22px;height:22px;border-radius:50%;background:var(--sur2);font-size:11px;font-weight:700;color:var(--tx2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rn.g1{background:#C9973A;color:#fff}
+.rn.g2{background:#888;color:#fff}
+.rn.g3{background:#A0522D;color:#fff}
+.ri-info{flex:1;min-width:0}
+.ri-n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-c{font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace}
+.ri-bw{height:3px;background:var(--bor);border-radius:2px;margin-top:4px;overflow:hidden}
+.ri-bf{height:100%;border-radius:2px;transition:width .5s}
+.ri-e{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;white-space:nowrap}
+
+/* SEC TITLE */
+.st{font-size:12px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between}
+.st span{font-weight:400;text-transform:none;letter-spacing:0}
+
+/* BOTTOM NAV */
+.bn{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bor);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.bn-its{display:flex;justify-content:space-around}
+.bni{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 16px;border:none;background:none;color:var(--tx2);font-size:10px;font-weight:500}
+.bni.on{color:var(--acc)}
+.bni-i{font-size:20px;line-height:1}
+
+/* SAVE BAR */
+.sb{position:fixed;bottom:0;left:0;right:0;background:var(--acc);color:#fff;padding:12px 20px;display:none;align-items:center;justify-content:space-between;z-index:60;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
+.sb.on{display:flex}
+.sb-m{font-size:13px;font-weight:500}
+.sb-as{display:flex;gap:8px}
+.btn-sv{background:#fff;color:var(--acc);border:none;border-radius:var(--rs);padding:8px 16px;font-size:13px;font-weight:700}
+.btn-cx{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:var(--rs);padding:8px 12px;font-size:13px}
+
+/* BTN */
+.btn-p{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--nv);color:#fff;border:none;border-radius:var(--rs);font-size:13px;font-weight:600;transition:background .15s}
+.btn-p:hover{background:#1a1a1a}
+.btn-s{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--sur);color:var(--tx);border:1px solid var(--bor);border-radius:var(--rs);font-size:13px;font-weight:600;transition:background .15s}
+.btn-s:hover{background:var(--sur2)}
+
+/* TOAST */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--nv);color:#fff;padding:10px 18px;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:var(--shm);z-index:300;transition:transform .25s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.on{transform:translateX(-50%) translateY(0)}
+
+.subtab{display:none}
+.subtab.on{display:block}
+.empty{text-align:center;padding:36px 20px;color:var(--tx3);font-size:13px}
+.reg-mty{background:#FEF3C7;color:#92400E;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;margin-right:4px}
+
+/* ESTADO CARGA */
+.estado-carga{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.ec-item{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:20px;border:1px solid var(--bor);background:var(--sur)}
+.ec-dot{width:8px;height:8px;border-radius:50%;background:#ddd;flex-shrink:0}
+.ec-dot.ok{background:var(--gn)}
+.ec-dot.err{background:var(--rd)}
+
+@media(max-width:600px){
+  .scr{padding:14px 14px 80px}
+  .bn{display:block}
+  .ntabs{display:none}
+  .en{font-size:28px}
+  .sr{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader" style="display:none">
+  <div class="spin"></div>
+  <div class="loader-msg" id="loader-msg">Procesando archivo...</div>
+</div>
+
+<!-- TOPBAR -->
+<div class="tb">
+  <div class="tb-l">
+    <div class="tb-logo">E+</div>
+    <div class="tb-name">EVI Plus <span class="tb-tag">MTY Valle</span></div>
+  </div>
+  <div class="tb-r">
+    <div class="tb-date" id="tb-date"></div>
+    <button class="btn-out" id="btn-out" style="display:none" onclick="logout()">Salir</button>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div class="scr on" id="scr-login">
+  <div class="lw">
+    <div class="lc">
+      <div class="lh">
+        <div class="lic">📊</div>
+        <div class="lt">EVI Plus</div>
+        <div class="ls">Seguimiento diario · MTY Valle 2025</div>
+      </div>
+      <div class="rtabs">
+        <button class="rtab on" id="rt-suc" onclick="setRole('suc')">Sucursal</button>
+        <button class="rtab" id="rt-dir" onclick="setRole('dir')">Director</button>
+      </div>
+      <div id="f-suc">
+        <div class="fg"><label>Sucursal</label>
+          <select id="sel-cr"><option value="">— Selecciona tu CR —</option></select>
+        </div>
+      </div>
+      <div id="f-dir" style="display:none">
+        <div class="fg"><label>Clave de acceso</label>
+          <input type="password" id="inp-pass" placeholder="••••••" autocomplete="off">
+        </div>
+      </div>
+      <button class="btn-en" onclick="doLogin()">Entrar al sistema</button>
+      <div class="ln">Plataforma interna · Regional Norte 2025</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUCURSAL ══ -->
+<div class="scr" id="scr-suc">
+  <div class="ntabs">
+    <button class="ntab on" onclick="showST('st-res',this)">Resumen</button>
+    <button class="ntab" onclick="showST('st-fam',this)">Familias</button>
+    <button class="ntab" onclick="showST('st-cap',this)">Captura del día</button>
+  </div>
+
+  <div class="subtab on" id="st-res">
+    <div class="vh">
+      <div class="vh-t" id="suc-title">—</div>
+      <div class="pt">
+        <button class="ptb on" onclick="setPer('mensual',this)">Mensual</button>
+        <button class="ptb" onclick="setPer('anual',this)">Anual</button>
+      </div>
+    </div>
+    <div class="eh">
+      <svg width="68" height="68" viewBox="0 0 68 68" style="flex-shrink:0">
+        <circle cx="34" cy="34" r="28" fill="none" stroke="#E4E4DF" stroke-width="7"/>
+        <circle id="evi-arc" cx="34" cy="34" r="28" fill="none" stroke="#2C2C2C" stroke-width="7"
+          stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9"
+          transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .7s,stroke .4s"/>
+      </svg>
+      <div class="ei">
+        <div class="el">EVI Total</div>
+        <div class="en" id="evi-n">—%</div>
+        <div class="es" id="evi-s">—</div>
+        <div class="eb">
+          <div class="ebi"><div class="ebi-l">Rango</div><div class="ebi-v" id="evi-r">—</div></div>
+          <div class="ebi"><div class="ebi-l">Pond.</div><div class="ebi-v" id="evi-p">—</div></div>
+          <div class="ebi"><div class="ebi-l">Logro</div><div class="ebi-v" id="evi-l">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="sr" id="suc-stats"></div>
+  </div>
+
+  <div class="subtab" id="st-fam">
+    <div class="vh">
+      <div class="st" style="border:0;padding:0;margin:0">Detalle por familia</div>
+      <div class="pt">
+        <button class="ptb on" onclick="setPer('mensual',this)">Mensual</button>
+        <button class="ptb" onclick="setPer('anual',this)">Anual</button>
+      </div>
+    </div>
+    <div class="fg-grid" id="fam-grid"></div>
+  </div>
+
+  <div class="subtab" id="st-cap">
+    <div class="st">Captura del día <span id="cap-fecha"></span></div>
+    <div id="cap-form"></div>
+    <div style="height:80px"></div>
+  </div>
+</div>
+
+<!-- ══ DIRECTOR ══ -->
+<div class="scr" id="scr-dir">
+  <div class="ntabs">
+    <button class="ntab on" onclick="showDT('dt-up',this)">📂 Cargar Archivos</button>
+    <button class="ntab" onclick="showDT('dt-rank',this)">Ranking MTY</button>
+    <button class="ntab" onclick="showDT('dt-cap',this)">Capturas del día</button>
+    <button class="ntab" onclick="showDT('dt-reg',this)">64 Regionales</button>
+  </div>
+
+  <!-- CARGA DE ARCHIVOS -->
+  <div class="subtab on" id="dt-up">
+    <div class="panel">
+      <h2>1 · Cargar EVI Mensual</h2>
+      <p>Sube el archivo EVI_MENSUAL_SUCURSALES.xls del día. El portal lee REAL, PPTO, ponderación y EVI de cada sucursal.</p>
+      <div class="up-zone" id="uz-men" onclick="document.getElementById('fi-men').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="onDrop(event,'men')">
+        <input type="file" id="fi-men" accept=".xls,.xlsx,.htm,.html" onchange="onFile(this,'men')">
+        <div class="up-icon">📅</div>
+        <div class="up-title">EVI Mensual</div>
+        <div class="up-sub">EVI_MENSUAL_SUCURSALES.xls</div>
+        <div class="pb" id="pb-men"><div class="pbf" id="pbf-men"></div></div>
+        <div class="up-st" id="st-men"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>2 · Cargar EVI Anual</h2>
+      <p>Sube el archivo EVI_ANUAL_SUCURSALES.xls del día.</p>
+      <div class="up-zone" id="uz-anu" onclick="document.getElementById('fi-anu').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="onDrop(event,'anu')">
+        <input type="file" id="fi-anu" accept=".xls,.xlsx,.htm,.html" onchange="onFile(this,'anu')">
+        <div class="up-icon">📆</div>
+        <div class="up-title">EVI Anual</div>
+        <div class="up-sub">EVI_ANUAL_SUCURSALES.xls</div>
+        <div class="pb" id="pb-anu"><div class="pbf" id="pbf-anu"></div></div>
+        <div class="up-st" id="st-anu"></div>
+      </div>
+    </div>
+
+    <!-- Estado de carga -->
+    <div class="panel">
+      <h2>Estado de archivos</h2>
+      <div class="estado-carga">
+        <div class="ec-item"><div class="ec-dot" id="dot-men"></div><span id="lbl-men">EVI Mensual — sin cargar</span></div>
+        <div class="ec-item"><div class="ec-dot" id="dot-anu"></div><span id="lbl-anu">EVI Anual — sin cargar</span></div>
+      </div>
+      <button class="btn-p" onclick="irARanking()" id="btn-ver" style="display:none">Ver Dashboard →</button>
+    </div>
+
+    <div class="panel">
+      <h2>⬇ Descargar capturas del día</h2>
+      <p>Descarga un CSV con todo lo que capturaron las sucursales hoy para montarlo en el archivo oficial.</p>
+      <button class="btn-p" onclick="descargarCSV()">⬇ Descargar CSV</button>
+    </div>
+  </div>
+
+  <!-- RANKING -->
+  <div class="subtab" id="dt-rank">
+    <div class="vh">
+      <div class="vh-t">MTY Valle — Ranking EVI</div>
+      <div class="pt">
+        <button class="ptb on" onclick="setDP('mensual',this)">Mensual</button>
+        <button class="ptb" onclick="setDP('anual',this)">Anual</button>
+      </div>
+    </div>
+    <div class="sr" id="dir-stats"></div>
+    <div class="st">Top sucursales <span>por EVI</span></div>
+    <div class="rl" id="dir-rank"></div>
+    <div class="st">Detalle completo</div>
+    <div class="tw"><table>
+      <thead><tr>
+        <th>#</th><th>CR · Sucursal</th>
+        <th class="r">EVI Archivo</th><th class="r">EVI + Hoy</th>
+        <th class="r">Cump %</th><th class="r">Capturó</th>
+      </tr></thead>
+      <tbody id="dir-tbody"></tbody>
+      <tfoot><tr>
+        <td colspan="2">Promedio MTY Valle</td>
+        <td class="r" id="dtf-a">—</td><td class="r" id="dtf-h">—</td>
+        <td class="r" id="dtf-c">—</td><td class="r" id="dtf-n">—</td>
+      </tr></tfoot>
+    </table></div>
+  </div>
+
+  <!-- CAPTURAS HOY -->
+  <div class="subtab" id="dt-cap">
+    <div class="vh">
+      <div class="st" style="border:0;padding:0;margin:0">Capturas del día <span id="cap-cnt"></span></div>
+      <button class="btn-s" onclick="descargarCSV()">⬇ CSV</button>
+    </div>
+    <div id="dir-cap-list"></div>
+  </div>
+
+  <!-- REGIONALES -->
+  <div class="subtab" id="dt-reg">
+    <div class="st">64 Regionales — EVI Archivo Mensual</div>
+    <div class="tw"><table>
+      <thead><tr><th>#</th><th>Regional</th><th class="r">Sucursales</th><th class="r">EVI Prom.</th><th></th></tr></thead>
+      <tbody id="reg-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bn" id="bn">
+  <div class="bn-its" id="bn-suc" style="display:none">
+    <button class="bni on" onclick="showSTm('st-res',this)"><span class="bni-i">📊</span>Resumen</button>
+    <button class="bni" onclick="showSTm('st-fam',this)"><span class="bni-i">📋</span>Familias</button>
+    <button class="bni" onclick="showSTm('st-cap',this)"><span class="bni-i">✏️</span>Captura</button>
+  </div>
+  <div class="bn-its" id="bn-dir" style="display:none">
+    <button class="bni on" onclick="showDTm('dt-up',this)"><span class="bni-i">📂</span>Archivos</button>
+    <button class="bni" onclick="showDTm('dt-rank',this)"><span class="bni-i">🏆</span>Ranking</button>
+    <button class="bni" onclick="showDTm('dt-cap',this)"><span class="bni-i">✏️</span>Capturas</button>
+    <button class="bni" onclick="showDTm('dt-reg',this)"><span class="bni-i">🗺️</span>Regionales</button>
+  </div>
+</div>
+
+<!-- SAVE BAR -->
+<div class="sb" id="sb">
+  <div class="sb-m">Captura sin guardar</div>
+  <div class="sb-as">
+    <button class="btn-cx" onclick="cancelCap()">Cancelar</button>
+    <button class="btn-sv" onclick="guardarCap()">Guardar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// FAMILIAS — mapeo exacto de columnas del archivo
+// [id, nombre, col_pond, col_real, col_ppto, col_logro, acelerador]
+// ══════════════════════════════════════════════════════
+const FAM = [
+  ['CAP_VISTA',  'Cap Vista Total',        8,  4,  5, 10, true ],
+  ['FONDOS',     'Fondos de Inversión',   15, 11, 12, 17, true ],
+  ['PLAZO',      'Plazo',                 22, 18, 19, 24, true ],
+  ['CRED_PYME',  'Crédito PYME',          29, 25, 26, 30, false],
+  ['CREDINOMINA','Credinómina',            35, 31, 32, 36, false],
+  ['AUTO',       'Auto',                  41, 37, 38, 42, false],
+  ['TDC_RED',    'TDC Red',               47, 43, 44, 48, false],
+  ['HIPO',       'Hipo MYR+FVE',          53, 49, 50, 54, false],
+  ['SEGUROS',    'Seguros',               60, 55, 56, 61, false],
+  ['APERTURAS',  'Aperturas',             66, 62, 63, 67, false],
+  ['NOM_NVA',    'Nómina Nva Com-PyME',   72, 68, 69, 73, false],
+  ['NOM_ANT',    'Nómina Ant Com-PyME',   78, 74, 75, 79, false],
+  ['EMISORAS',   'Emisoras Com-PyME',     84, 80, 81, 85, false],
+  ['TPV',        'TPV Com-PyME',          90, 86, 87, 91, false],
+  ['PORTABILIDAD','Portabilidad',          96, 92, 93, 97, false],
+];
+
+const CRS_MTY = ['265','129','154','147','239','135','1039','1925','59',
+                 '161','1021','146','3749','123','584','1924','47','54'];
+const PASS = 'mty2025';
+
+// ══════════════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════════════
+let DATA = {mensual:{}, anual:{}, regionales:{}};
+let capturas = {}, borrador = {};
+let hayCambios = false;
+let role = 'suc', crActivo = null;
+let periodo = 'mensual', dPeriodo = 'mensual';
+let cargaMen = false, cargaAnu = false;
+
+// Cargar capturas del localStorage
+try{ const r=localStorage.getItem('evi_cap'); if(r) capturas=JSON.parse(r); }catch(e){}
+
+// ══════════════════════════════════════════════════════
+// PARSER — lee el HTML del .xls
+// ══════════════════════════════════════════════════════
+function parsear(content){
+  const trRe=/<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  const trs=[]; let m;
+  while((m=trRe.exec(content))!==null) trs.push(m[1]);
+  const rows=[];
+  for(let i=3;i<trs.length;i++){
+    const tds=[]; let mt;
+    const tdRe=/<td[^>]*>([\s\S]*?)<\/td>/gi;
+    while((mt=tdRe.exec(trs[i]))!==null)
+      tds.push(mt[1].replace(/<[^>]+>/g,'').trim());
+    if(!tds[0]||!/^\d+$/.test(tds[0].trim())) continue;
+    rows.push(tds);
+  }
+  return rows;
+}
+
+function pN(s){
+  if(!s||['NA','N/A',''].includes(String(s).trim())) return 0;
+  return parseFloat(String(s).replace(/,/g,'').replace(/%/g,''))||0;
+}
+
+function buildData(rows){
+  const out={}, reg={};
+  for(const r of rows){
+    const cr=r[0]?.trim(); if(!cr) continue;
+    const fams={};
+    for(const [fid,,pc,rc,pp,lc] of FAM){
+      fams[fid]={pond:pN(r[pc]),real:pN(r[rc]),ppto:pN(r[pp]),logro:pN(r[lc]),cump:pN(r[rc+2])};
+    }
+    out[cr]={cr,nombre:r[1]||'',regional:r[2]||'',territorial:r[3]||'',
+      evi_rango:pN(r[98]),evi_pond:pN(r[99]),evi_logro:pN(r[100]),evi_total:pN(r[101]),familias:fams};
+    const rv=r[2]||'';
+    if(!reg[rv]) reg[rv]={count:0,evi_sum:0,evi_n:0};
+    reg[rv].count++;
+    const ev=pN(r[101]);
+    if(ev>0){reg[rv].evi_sum+=ev;reg[rv].evi_n++;}
+  }
+  return{out,reg};
+}
+
+// ══════════════════════════════════════════════════════
+// CARGA DE ARCHIVOS
+// ══════════════════════════════════════════════════════
+function onDrop(ev,tipo){
+  ev.preventDefault();
+  document.getElementById('uz-'+tipo).classList.remove('drag');
+  const f=ev.dataTransfer.files[0];
+  if(f) procesarArchivo(f,tipo);
+}
+function onFile(inp,tipo){
+  if(inp.files[0]) procesarArchivo(inp.files[0],tipo);
+}
+
+function procesarArchivo(file,tipo){
+  const pb=document.getElementById('pb-'+tipo);
+  const pbf=document.getElementById('pbf-'+tipo);
+  const st=document.getElementById('st-'+tipo);
+  pb.style.display='block'; pbf.style.width='20%';
+  st.className='up-st'; st.textContent='⏳ Leyendo archivo...'; st.style.display='block';
+
+  const reader=new FileReader();
+  reader.onload=function(e){
+    pbf.style.width='80%';
+    try{
+      const rows=parsear(e.target.result);
+      if(rows.length===0) throw new Error('No se encontraron datos. Verifica el archivo.');
+      const {out,reg}=buildData(rows);
+      pbf.style.width='100%';
+      if(tipo==='men'){
+        DATA.mensual=out;
+        DATA.regionales=reg;
+        cargaMen=true;
+        document.getElementById('dot-men').className='ec-dot ok';
+        document.getElementById('lbl-men').textContent=`EVI Mensual — ${rows.length} sucursales ✓`;
+        st.className='up-st up-ok';
+        st.textContent=`✓ ${rows.length} sucursales · ${Object.keys(out).filter(cr=>CRS_MTY.includes(cr)).length} MTY Valle`;
+        poblarSelect();
+      } else {
+        DATA.anual=out;
+        cargaAnu=true;
+        document.getElementById('dot-anu').className='ec-dot ok';
+        document.getElementById('lbl-anu').textContent=`EVI Anual — ${rows.length} sucursales ✓`;
+        st.className='up-st up-ok';
+        st.textContent=`✓ ${rows.length} sucursales cargadas`;
+      }
+      if(cargaMen||cargaAnu){
+        document.getElementById('btn-ver').style.display='inline-flex';
+      }
+      showToast('✓ Archivo cargado correctamente');
+    }catch(err){
+      pbf.style.background='#DC2626';
+      st.className='up-st up-err';
+      st.textContent='✕ Error: '+err.message;
+    }
+  };
+  reader.readAsText(file,'latin1');
+}
+
+function irARanking(){
+  showDT('dt-rank', null);
+  document.querySelectorAll('#scr-dir .ntab').forEach((b,i)=>{
+    b.className='ntab'+(i===1?' on':'');
+  });
+  renderDir();
+}
+
+// ══════════════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════════════
+function poblarSelect(){
+  const sel=document.getElementById('sel-cr');
+  const prev=sel.value;
+  sel.innerHTML='<option value="">— Selecciona tu CR —</option>';
+  CRS_MTY.forEach(cr=>{
+    const d=DATA.mensual[cr]||DATA.anual[cr];
+    if(d) sel.innerHTML+=`<option value="${cr}">${cr} · ${d.nombre}</option>`;
+  });
+  if(prev) sel.value=prev;
+}
+
+function setRole(r){
+  role=r;
+  document.getElementById('rt-suc').className='rtab'+(r==='suc'?' on':'');
+  document.getElementById('rt-dir').className='rtab'+(r==='dir'?' on':'');
+  document.getElementById('f-suc').style.display=r==='suc'?'block':'none';
+  document.getElementById('f-dir').style.display=r==='dir'?'block':'none';
+}
+
+function doLogin(){
+  if(role==='suc'){
+    const cr=document.getElementById('sel-cr').value;
+    if(!cr){showToast('Selecciona tu sucursal');return;}
+    if(!DATA.mensual[cr]&&!DATA.anual[cr]){
+      showToast('El director aún no ha cargado los archivos del día');return;
+    }
+    crActivo=cr;
+    showScr('suc');
+    renderSuc();
+  } else {
+    if(document.getElementById('inp-pass').value!==PASS){showToast('Clave incorrecta');return;}
+    showScr('dir');
+  }
+}
+
+function logout(){
+  crActivo=null; borrador={}; hayCambios=false;
+  document.getElementById('sb').classList.remove('on');
+  document.getElementById('bn').style.display='none';
+  document.getElementById('btn-out').style.display='none';
+  showScr('login');
+}
+
+function showScr(n){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.getElementById('scr-'+n).classList.add('on');
+  if(n!=='login'){
+    document.getElementById('btn-out').style.display='block';
+    document.getElementById('bn').style.display='block';
+    document.getElementById('bn-suc').style.display=n==='suc'?'flex':'none';
+    document.getElementById('bn-dir').style.display=n==='dir'?'flex':'none';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════
+function showST(id,btn){
+  document.querySelectorAll('#scr-suc .subtab').forEach(s=>{s.classList.remove('on');s.style.display='none';});
+  document.getElementById(id).classList.add('on');document.getElementById(id).style.display='block';
+  document.querySelectorAll('#scr-suc .ntab').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(id==='st-cap') renderCap();
+}
+function showSTm(id,btn){
+  showST(id,null);
+  document.querySelectorAll('#bn-suc .bni').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+}
+function showDT(id,btn){
+  document.querySelectorAll('#scr-dir .subtab').forEach(s=>{s.classList.remove('on');s.style.display='none';});
+  document.getElementById(id).classList.add('on');document.getElementById(id).style.display='block';
+  document.querySelectorAll('#scr-dir .ntab').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(id==='dt-rank'||id==='dt-cap'||id==='dt-reg') renderDir();
+}
+function showDTm(id,btn){
+  showDT(id,null);
+  document.querySelectorAll('#bn-dir .bni').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+}
+
+function setPer(p,btn){
+  periodo=p;
+  document.querySelectorAll('#scr-suc .pt .ptb').forEach(b=>b.className='ptb'+(b===btn?' on':''));
+  renderSuc();
+}
+function setDP(p,btn){
+  dPeriodo=p;
+  document.querySelectorAll('#scr-dir .pt .ptb').forEach(b=>b.className='ptb'+(b===btn?' on':''));
+  renderDir();
+}
+
+// ══════════════════════════════════════════════════════
+// UTILIDADES
+// ══════════════════════════════════════════════════════
+function fN(v,d=2){if(v===null||v===undefined||isNaN(v))return'—';return v.toLocaleString('es-MX',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fP(v){if(v===null||isNaN(v))return'—';return v.toFixed(1)+'%';}
+function cCls(v){if(v===null)return'cgr';if(v>=85)return'cg';if(v>=60)return'ca';return'cr2';}
+function bClr(v){if(v>=85)return'#15803D';if(v>=60)return'#D97706';return'#DC2626';}
+function eClr(v){if(v>=80)return'#15803D';if(v>=60)return'#D97706';return'#DC2626';}
+function dHabil(){
+  const hoy=new Date(),fin=new Date(hoy.getFullYear(),hoy.getMonth()+1,0);
+  let d=0,c=new Date(hoy);c.setDate(c.getDate()+1);
+  while(c<=fin){const dw=c.getDay();if(dw!==0&&dw!==6)d++;c.setDate(c.getDate()+1);}
+  return d;
+}
+function dMes(){const n=new Date();return new Date(n.getFullYear(),n.getMonth()+1,0).getDate();}
+function dHoy(){return new Date().getDate();}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2500);
+}
+
+// ══════════════════════════════════════════════════════
+// EVI CON CAPTURA
+// ══════════════════════════════════════════════════════
+function calcEvi(cr,p){
+  const d=(p==='mensual'?DATA.mensual:DATA.anual)[cr];
+  if(!d) return 0;
+  const cap={...(capturas[cr]||{}),...(borrador[cr]||{})};
+  let evi=0;
+  FAM.forEach(([fid,,pc,rc,pp,,acel])=>{
+    const f=d.familias[fid]; if(!f||!f.pond) return;
+    const hoy=cap[fid]||0, rt=f.real+hoy;
+    const cump=f.ppto>0?(rt/f.ppto)*100:0;
+    const logro=acel
+      ?(cump>=90?f.pond*(1+Math.min((cump-90)/100,.5)):cump>=80?f.pond*(cump/100):0)
+      :(cump>=80?f.pond*(Math.min(cump,150)/100):0);
+    evi+=logro;
+  });
+  return evi;
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER SUCURSAL
+// ══════════════════════════════════════════════════════
+function renderSuc(){
+  const cr=crActivo;
+  const d=(periodo==='mensual'?DATA.mensual:DATA.anual)[cr];
+  if(!d) return;
+  document.getElementById('suc-title').textContent=`CR ${cr} — ${d.nombre}`;
+  const arc=document.getElementById('evi-arc');
+  arc.style.strokeDashoffset=(175.9*(1-Math.min(d.evi_total/100,1))).toFixed(1);
+  arc.style.stroke=eClr(d.evi_total);
+  document.getElementById('evi-n').textContent=fP(d.evi_total);
+  document.getElementById('evi-n').style.color=eClr(d.evi_total);
+  document.getElementById('evi-s').textContent=periodo==='mensual'?'EVI Mensual':'EVI Anual';
+  document.getElementById('evi-r').textContent=fP(d.evi_rango);
+  document.getElementById('evi-p').textContent=fP(d.evi_pond);
+  document.getElementById('evi-l').textContent=fP(d.evi_logro);
+  const fOk=Object.values(d.familias).filter(f=>f.cump>=85).length;
+  const fTot=Object.values(d.familias).filter(f=>f.ppto>0).length;
+  const eHoy=calcEvi(cr,periodo);
+  document.getElementById('suc-stats').innerHTML=`
+    <div class="sc"><div class="sc-l">Familias al meta</div>
+      <div class="sc-v" style="color:${fOk>=10?'var(--gn)':'var(--am)'}">${fOk}<span style="font-size:14px;color:var(--tx3)">/${fTot}</span></div>
+      <div class="sc-s">≥ 85% cumplimiento</div></div>
+    <div class="sc"><div class="sc-l">EVI + Hoy</div>
+      <div class="sc-v" style="color:${eClr(eHoy)}">${fP(eHoy)}</div>
+      <div class="sc-s">con captura del día</div></div>
+    <div class="sc"><div class="sc-l">Pond. máxima</div>
+      <div class="sc-v">${fP(d.evi_pond)}</div>
+      <div class="sc-s">alcanzable</div></div>`;
+  renderFams(d,cr);
+}
+
+function renderFams(d,cr){
+  const cap={...(capturas[cr]||{}),...(borrador[cr]||{})};
+  let html='';
+  FAM.forEach(([fid,,,,,,acel])=>{
+    const f=d.familias[fid]; if(!f) return;
+    const hoy=cap[fid]||0,rt=f.real+hoy;
+    const cump=f.ppto>0?(rt/f.ppto)*100:0;
+    const isCap=fid==='CAP_VISTA';
+    html+=`<div class="fc" id="fc-${fid}">
+      <div class="fc-h" onclick="togFam('${fid}')">
+        <div class="fc-n">${isCap?'💧 ':''}${f.nombre||fid}</div>
+        <div class="fc-r">
+          <div class="fc-p">${f.pond>0?f.pond+'%':'—'}</div>
+          <span class="chip ${cCls(cump)}">${fP(cump)}</span>
+          <span class="fc-ch">▾</span>
+        </div>
+      </div>
+      <div class="fc-pg"><div class="fc-pgf" style="width:${Math.min(cump,100)}%;background:${bClr(cump)}"></div></div>
+      <div class="fc-b">
+        <div class="fd">
+          <div><div class="fdi-l">PPTO</div><div class="fdi-v">${fN(f.ppto)}</div></div>
+          <div><div class="fdi-l">Real acum.</div><div class="fdi-v">${fN(f.real)}</div></div>
+          <div><div class="fdi-l">Hoy capturado</div><div class="fdi-v" style="color:var(--acc)">${fN(hoy)}</div></div>
+          <div><div class="fdi-l">Real total</div><div class="fdi-v">${fN(rt)}</div></div>
+          <div><div class="fdi-l">Logro archivo</div><div class="fdi-v">${fP(f.logro)}</div></div>
+          ${acel?'<div><div class="fdi-l">Acelerador</div><div class="fdi-v" style="color:var(--gn)">✓ Aplica</div></div>':''}
+        </div>
+        ${isCap?renderCapVista(f,hoy):''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('fam-grid').innerHTML=html;
+}
+
+function renderCapVista(f,hoy){
+  const dT=dMes(),dH=dHoy(),dR=dHabil();
+  const pD=f.ppto/dT, nR=f.real+hoy, falt=Math.max(0,f.ppto-nR);
+  const pDia=dR>0?falt/dR:0, nC=f.ppto>0?(nR/f.ppto)*100:0;
+  return`<div class="cb cb-r">
+    <div class="cb-t">💧 Proyección al cierre del mes</div>
+    <div style="font-size:11px;color:var(--tx2);line-height:1.9">
+      <div>Día ${dH} de ${dT} · <strong>${dR}</strong> días hábiles restantes</div>
+      <div>PPTO diario promedio: <strong>${fN(pD)}</strong></div>
+      <div>Cumplimiento proyectado: <strong style="color:${bClr(nC)}">${fP(nC)}</strong></div>
+      <div>Faltante al meta: <strong style="color:var(--rd)">${fN(falt)}</strong></div>
+      <div>Necesario por día restante: <strong style="color:var(--am)">${fN(pDia)}</strong></div>
+    </div>
+  </div>`;
+}
+
+function togFam(fid){document.getElementById('fc-'+fid).classList.toggle('open');}
+
+// ══════════════════════════════════════════════════════
+// CAPTURA
+// ══════════════════════════════════════════════════════
+function renderCap(){
+  const cr=crActivo, d=DATA.mensual[cr]; if(!d) return;
+  const cap={...(capturas[cr]||{}),...(borrador[cr]||{})};
+  const dR=dHabil(), dH=dHoy(), dT=dMes();
+  document.getElementById('cap-fecha').textContent=
+    new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+  let html='';
+  FAM.forEach(([fid,,,,,,acel])=>{
+    const f=d.familias[fid]; if(!f||!f.ppto) return;
+    const hoy=cap[fid]||0, rt=f.real+hoy;
+    const cump=f.ppto>0?(rt/f.ppto)*100:0;
+    const isCap=fid==='CAP_VISTA';
+    const falt=Math.max(0,f.ppto-rt), pDia=dR>0?falt/dR:0;
+    let proyHtml='';
+    if(isCap){
+      proyHtml=`<div class="cr-box" id="proj-${fid}">
+        <div class="cr-row"><span>Nuevo acumulado</span><span>${fN(rt)}</span></div>
+        <div class="cr-row"><span>Cump. proyectado</span><span style="color:${bClr(cump)}">${fP(cump)}</span></div>
+        <div class="cr-row"><span>Faltante al meta</span><span>${fN(falt)}</span></div>
+        <div class="cr-row tot"><span>Necesario / día restante</span><span style="color:var(--am)">${fN(pDia)}</span></div>
+      </div>
+      <div class="cp-note">Día ${dH} de ${dT} · ${dR} días hábiles restantes</div>`;
+    }
+    html+=`<div class="fc" style="margin-bottom:8px">
+      <div class="fc-h" style="cursor:default">
+        <div class="fc-n">${isCap?'💧 ':''}${f.nombre||fid}</div>
+        <div class="fc-r"><div class="fc-p">${f.pond}%</div><span class="chip ${cCls(cump)}">${fP(cump)}</span></div>
+      </div>
+      <div class="fc-b" style="display:block">
+        <div class="fd" style="margin-bottom:10px">
+          <div><div class="fdi-l">Real acum.</div><div class="fdi-v">${fN(f.real)}</div></div>
+          <div><div class="fdi-l">PPTO</div><div class="fdi-v">${fN(f.ppto)}</div></div>
+        </div>
+        <div class="cb ${isCap?'cb-r':'cb-g'}">
+          <div class="cb-t">${isCap?'💧 ':''}Colocado hoy</div>
+          <input class="ci" type="number" min="0" step="any" inputmode="decimal"
+            id="ci-${fid}" value="${hoy||''}" placeholder="0"
+            oninput="onInp('${fid}','${cr}',${isCap})">
+          ${proyHtml}
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('cap-form').innerHTML=html;
+}
+
+function onInp(fid,cr,isCap){
+  const val=parseFloat(document.getElementById('ci-'+fid).value)||0;
+  if(!borrador[cr]) borrador[cr]={};
+  borrador[cr][fid]=val;
+  hayCambios=true;
+  document.getElementById('sb').classList.add('on');
+  if(isCap){
+    const f=DATA.mensual[cr]?.familias[fid]; if(!f) return;
+    const rt=f.real+val, cump=f.ppto>0?(rt/f.ppto)*100:0;
+    const dR=dHabil(), falt=Math.max(0,f.ppto-rt), pDia=dR>0?falt/dR:0;
+    const el=document.getElementById('proj-'+fid);
+    if(el) el.innerHTML=`
+      <div class="cr-row"><span>Nuevo acumulado</span><span>${fN(rt)}</span></div>
+      <div class="cr-row"><span>Cump. proyectado</span><span style="color:${bClr(cump)}">${fP(cump)}</span></div>
+      <div class="cr-row"><span>Faltante al meta</span><span>${fN(falt)}</span></div>
+      <div class="cr-row tot"><span>Necesario / día restante</span><span style="color:var(--am)">${fN(pDia)}</span></div>`;
+  }
+}
+
+function guardarCap(){
+  for(const[cr,vals] of Object.entries(borrador))
+    capturas[cr]={...(capturas[cr]||{}),...vals};
+  borrador={}; hayCambios=false;
+  try{localStorage.setItem('evi_cap',JSON.stringify(capturas));}catch(e){}
+  document.getElementById('sb').classList.remove('on');
+  showToast('Captura guardada ✓');
+  renderSuc();
+}
+function cancelCap(){
+  borrador={}; hayCambios=false;
+  document.getElementById('sb').classList.remove('on');
+  renderCap();
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER DIRECTOR
+// ══════════════════════════════════════════════════════
+function renderDir(){
+  const p=dPeriodo, src=p==='mensual'?DATA.mensual:DATA.anual;
+  const sucs=CRS_MTY.map(cr=>{
+    const d=src[cr]; if(!d) return null;
+    const cap=capturas[cr]||{};
+    const tCap=Object.values(cap).some(v=>v>0);
+    const eHoy=calcEvi(cr,p);
+    let tP=0,tR=0,tH=0;
+    FAM.forEach(([fid])=>{const f=d.familias[fid];if(!f)return;tP+=f.ppto;tR+=f.real;tH+=cap[fid]||0;});
+    return{cr,nombre:d.nombre,eArch:d.evi_total,eHoy,cump:tP>0?((tR+tH)/tP)*100:0,tCap,tH};
+  }).filter(Boolean).sort((a,b)=>(b.tCap?b.eHoy:b.eArch)-(a.tCap?a.eHoy:a.eArch));
+
+  const conCap=sucs.filter(s=>s.tCap).length;
+  const avgA=sucs.reduce((a,s)=>a+s.eArch,0)/sucs.length;
+  const avgH=sucs.reduce((a,s)=>a+(s.tCap?s.eHoy:s.eArch),0)/sucs.length;
+
+  // Stats
+  document.getElementById('dir-stats').innerHTML=`
+    <div class="sc"><div class="sc-l">Capturaron hoy</div>
+      <div class="sc-v">${conCap}<span style="font-size:14px;color:var(--tx3)">/${sucs.length}</span></div>
+      <div class="sc-s">sucursales MTY Valle</div></div>
+    <div class="sc"><div class="sc-l">EVI Archivo prom.</div>
+      <div class="sc-v" style="color:${eClr(avgA)}">${fP(avgA)}</div>
+      <div class="sc-s">${p}</div></div>
+    <div class="sc"><div class="sc-l">EVI + Hoy prom.</div>
+      <div class="sc-v" style="color:${eClr(avgH)}">${fP(avgH)}</div>
+      <div class="sc-s">con capturas del día</div></div>`;
+
+  // Ranking
+  let rk='';
+  sucs.slice(0,10).forEach((s,i)=>{
+    const eM=s.tCap?s.eHoy:s.eArch;
+    const nc=i===0?'g1':i===1?'g2':i===2?'g3':'';
+    rk+=`<div class="ri">
+      <div class="rn ${nc}">${i+1}</div>
+      <div class="ri-info">
+        <div class="ri-n">${s.nombre}</div>
+        <div class="ri-c">CR ${s.cr}${s.tCap?' · capturó hoy':''}</div>
+        <div class="ri-bw"><div class="ri-bf" style="width:${Math.min(eM,100)}%;background:${bClr(eM)}"></div></div>
+      </div>
+      <div class="ri-e" style="color:${eClr(eM)}">${fP(eM)}</div>
+    </div>`;
+  });
+  document.getElementById('dir-rank').innerHTML=rk;
+
+  // Tabla
+  let tb='';
+  sucs.forEach((s,i)=>{
+    const eM=s.tCap?s.eHoy:s.eArch;
+    tb+=`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${i+1}</td>
+      <td><strong>CR ${s.cr}</strong> · ${s.nombre}</td>
+      <td class="r"><span class="chip ${cCls(s.eArch)}">${fP(s.eArch)}</span></td>
+      <td class="r"><span class="chip ${cCls(eM)}">${fP(eM)}</span></td>
+      <td class="r">${fP(s.cump)}</td>
+      <td class="r">${s.tCap?'<span class="chip cg">Sí</span>':'<span class="chip cgr">—</span>'}</td>
+    </tr>`;
+  });
+  document.getElementById('dir-tbody').innerHTML=tb;
+  document.getElementById('dtf-a').textContent=fP(avgA);
+  document.getElementById('dtf-h').textContent=fP(avgH);
+  document.getElementById('dtf-c').textContent=fP(sucs.reduce((a,s)=>a+s.cump,0)/sucs.length);
+  document.getElementById('dtf-n').textContent=`${conCap}/${sucs.length}`;
+
+  // Capturas
+  document.getElementById('cap-cnt').textContent=`${conCap} de ${sucs.length}`;
+  let cl='';
+  sucs.forEach(s=>{
+    if(!s.tCap){
+      cl+=`<div class="fc" style="margin-bottom:8px;opacity:.4">
+        <div class="fc-h" style="cursor:default">
+          <div class="fc-n">CR ${s.cr} · ${s.nombre}</div>
+          <span class="chip cgr">Sin captura</span>
+        </div></div>`;
+      return;
+    }
+    const cap=capturas[s.cr]||{}, dS=src[s.cr];
+    let rows='';
+    FAM.forEach(([fid])=>{
+      const v=cap[fid]||0; if(!v) return;
+      rows+=`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bor);font-size:12px">
+        <span style="color:var(--tx2)">${dS?.familias[fid]?.nombre||fid}</span>
+        <span style="font-family:'DM Mono',monospace;font-weight:600">${fN(v)}</span>
+      </div>`;
+    });
+    cl+=`<div class="fc" style="margin-bottom:8px">
+      <div class="fc-h" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <div class="fc-n">CR ${s.cr} · ${s.nombre}</div>
+        <div class="fc-r">
+          <span class="chip" style="background:var(--acc-s);color:var(--acc)">EVI ${fP(s.eHoy)}</span>
+          <span class="chip cg">Capturó</span>
+          <span class="fc-ch">▾</span>
+        </div>
+      </div>
+      <div class="fc-b" style="display:none">${rows||'<div class="empty">Sin datos</div>'}</div>
+    </div>`;
+  });
+  document.getElementById('dir-cap-list').innerHTML=cl||'<div class="empty">Sin capturas registradas hoy</div>';
+
+  // Regionales
+  const regs=Object.entries(DATA.regionales)
+    .map(([r,v])=>({r,count:v.count,evi:v.evi_n>0?v.evi_sum/v.evi_n:0}))
+    .sort((a,b)=>b.evi-a.evi);
+  let rg='';
+  regs.forEach((x,i)=>{
+    const isMty=x.r==='MTY VALLE';
+    rg+=`<tr style="${isMty?'background:#FFFBF0;font-weight:600':''}">
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${i+1}</td>
+      <td>${isMty?'<span class="reg-mty">★ Tuya</span>':''}${x.r}</td>
+      <td class="r">${x.count}</td>
+      <td class="r"><span class="chip ${cCls(x.evi)}">${fP(x.evi)}</span></td>
+      <td style="width:80px"><div style="height:4px;background:var(--bor);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(x.evi,100)}%;background:${bClr(x.evi)};border-radius:2px"></div>
+      </div></td>
+    </tr>`;
+  });
+  document.getElementById('reg-tbody').innerHTML=rg;
+}
+
+// ══════════════════════════════════════════════════════
+// CSV DIRECTOR
+// ══════════════════════════════════════════════════════
+function descargarCSV(){
+  const fecha=new Date().toLocaleDateString('es-MX').replace(/\//g,'-');
+  let csv='FECHA,CR,SUCURSAL,FAMILIA,COLOCADO_HOY\n';
+  CRS_MTY.forEach(cr=>{
+    const cap=capturas[cr]||{}, d=DATA.mensual[cr];
+    if(!Object.values(cap).some(v=>v>0)) return;
+    FAM.forEach(([fid])=>{
+      const v=cap[fid]||0; if(!v) return;
+      csv+=`${fecha},${cr},"${d?.nombre||cr}","${d?.familias[fid]?.nombre||fid}",${v}\n`;
+    });
+  });
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=`EVI_Capturas_${fecha}.csv`;
+  a.click();
+  showToast('CSV descargado ✓');
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+document.getElementById('tb-date').textContent=
+  new Date().toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+document.getElementById('inp-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('sel-cr').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// Si hay sucursales cargadas de sesión anterior, mostrar select
+poblarSelect();
+</script>
+</body>
+</html>
